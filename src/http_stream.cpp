@@ -312,6 +312,31 @@ void send_json(detection *dets, int nboxes, int classes, char **names, long long
         send_json_custom(send_buf, port, timeout);
         std::cout << " JSON-stream sent. \n";
 
+		//samson
+
+		/*
+
+		std::cout << " JSON-stream sent " << std::flush;
+
+		switch(frame_id % 4){
+			case 0:
+				std::cout << "\\" << std::flush;
+				break;
+			case 1:
+				std::cout << "|" << std::flush;
+				break;
+			case 2:
+				std::cout << "/" << std::flush;
+				break;
+			case 3:
+				std::cout << "-" << std::flush;
+				break;
+		}
+
+        free(send_buf);
+		std::cout << "\r" << std::flush;  
+		*/
+
         free(send_buf);
     }
     catch (...) {
@@ -535,6 +560,8 @@ void send_mjpeg(mat_cv* mat, int port, int timeout, int quality)
         static MJPG_sender wri(port, timeout, quality);
         //cv::Mat mat = cv::cvarrToMat(ipl);
         wri.write(*(cv::Mat*)mat);
+        //std::cout << " MJPEG-stream sent. \n";
+		//samson
         std::cout << " MJPEG-stream sent. \n";
     }
     catch (...) {
