@@ -200,6 +200,13 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
         //'W', 'M', 'V', '2'
     }
 
+
+	//samson
+	int i, k, should_save_detection, skip_saving_frames;
+	skip_saving_frames = 0;
+	char labelstr[4096] = { 0 };
+	char this_buff[10];
+
     int send_http_post_once = 0;
     const double start_time_lim = get_time_point();
     double before = get_time_point();
@@ -248,6 +255,14 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
             free_detections(local_dets, local_nboxes);
 
+			//Samson, TBD: Send image to some program
+			/*
+                char buff[256];
+                sprintf(buff, "%s_%08d.jpg", prefix, count);
+                if(show_img) save_cv_jpg(show_img, buff); //save image files
+				*/
+		
+
             printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
 
             if(!prefix){
@@ -266,9 +281,68 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                     }
                 }
             }else{
+
+				//original code//
+				/*
                 char buff[256];
                 sprintf(buff, "%s_%08d.jpg", prefix, count);
                 if(show_img) save_cv_jpg(show_img, buff);
+				*/
+
+				should_save_detection = 0;
+
+				memset(labelstr, 0, 4096);
+				memset(this_buff, 0, 10);
+									
+				if (local_nboxes > 0)
+				{
+					for (i = 0; i < local_nboxes; ++i) {
+						
+						for (k = 0; k < demo_classes; ++k) {
+							
+							if (local_dets[i].prob[k] > demo_thresh) {
+
+								should_save_detection++;			
+								strcat(labelstr, demo_names[k]);															
+								sprintf(this_buff, " %2.0f%%", local_dets[i].prob[k] * 100);
+								strcat(labelstr, this_buff);
+								strcat(labelstr, ", ");	
+							}							
+						}
+						//strcat(labelstr, "\n ");
+					}
+
+
+
+					if (should_save_detection > 0 )
+					{
+						printf("***detected: ");
+						printf("%s \n", labelstr);
+
+						if (skip_saving_frames <= 0)
+						{
+							//add delay for saving
+							//delay should be around 10s, so for frames to delay
+							skip_saving_frames = floor(10*fps); 
+							printf("Will skip next %d frames \n", skip_saving_frames);
+
+							char buff[256];
+							sprintf(buff, "%s_%010d.jpg", prefix, count);
+							if(show_img) save_cv_jpg(show_img, buff); //save image files
+
+							printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
+						}else
+						{
+							//Detected no saving for every 3s
+							printf("Skipped saving \n");
+						}
+
+					}
+					skip_saving_frames--;
+				
+
+					//free(should_save_detection);
+				}
             }
 
             // if you run it with param -mjpeg_port 8090  then open URL in your web-browser: http://localhost:8090
@@ -345,7 +419,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
     free_ptrs((void **)names, net.layers[net.n - 1].classes);
 
-    int i;
+	//samson
+    //int i;
     const int nsize = 8;
     for (j = 0; j < nsize; ++j) {
         for (i = 32; i < 127; ++i) {
