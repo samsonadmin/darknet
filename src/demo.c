@@ -202,10 +202,13 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
 
 	//samson
-	int i, k, should_save_detection, skip_saving_frames;
+	int i, k, skip_saving_frames;
 	skip_saving_frames = 0;
 	char labelstr[4096] = { 0 };
-	char this_buff[10];
+	char this_buff[100];
+	char buff[256];
+	int should_save_detection = 1;
+
 
     int send_http_post_once = 0;
     const double start_time_lim = get_time_point();
@@ -253,7 +256,9 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             }
 
             if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
-            free_detections(local_dets, local_nboxes);
+
+			//samson, moved down
+			//free_detections(local_dets, local_nboxes);			
 
 			//Samson, TBD: Send image to some program
 			/*
@@ -282,6 +287,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 }
             }else{
 
+
 				//original code//
 				/*
                 char buff[256];
@@ -289,16 +295,19 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 if(show_img) save_cv_jpg(show_img, buff);
 				*/
 
-				should_save_detection = 0;
+				should_save_detection = 1;
 
 				memset(labelstr, 0, 4096);
-				memset(this_buff, 0, 10);
+				memset(this_buff, 0, 100);
 									
 				if (local_nboxes > 0)
 				{
+					int i;
 					for (i = 0; i < local_nboxes; ++i) {
 						
 						for (k = 0; k < demo_classes; ++k) {
+
+							//printf("%f \n", local_dets[i].prob[k]);
 							
 							if (local_dets[i].prob[k] > demo_thresh) {
 
@@ -317,6 +326,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 					if (should_save_detection > 0 )
 					{
 						printf("***detected: ");
+						labelstr[strlen(labelstr) - 2] = '\0';
+						labelstr[strlen(labelstr) - 1] = '\0';
 						printf("%s \n", labelstr);
 
 						if (skip_saving_frames <= 0)
@@ -326,7 +337,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 							skip_saving_frames = floor(10*fps); 
 							printf("Will skip next %d frames \n", skip_saving_frames);
 
-							char buff[256];
+							//char buff[256];
 							sprintf(buff, "%s_%010d.jpg", prefix, count);
 							if(show_img) save_cv_jpg(show_img, buff); //save image files
 
@@ -343,13 +354,16 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
 					//free(should_save_detection);
 				}
+
             }
+			//samson, moved down
+			free_detections(local_dets, local_nboxes);
 
             // if you run it with param -mjpeg_port 8090  then open URL in your web-browser: http://localhost:8090
             if (mjpeg_port > 0 && show_img) {
                 int port = mjpeg_port;
                 int timeout = 400000;
-                int jpeg_quality = 40;    // 1 - 100
+                int jpeg_quality = 50;    // 1 - 100
                 send_mjpeg(show_img, port, timeout, jpeg_quality);
             }
 
