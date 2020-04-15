@@ -469,6 +469,7 @@ extern "C" void show_image_mat(mat_cv *mat_ptr, const char *name)
         if (mat_ptr == NULL) return;
         cv::Mat &mat = *(cv::Mat *)mat_ptr;
         cv::namedWindow(name, cv::WINDOW_NORMAL);
+		cv::setWindowProperty(name, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
         cv::imshow(name, mat);
     }
     catch (...) {

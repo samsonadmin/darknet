@@ -236,7 +236,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             //printf("\033[2J");
             //printf("\033[1;1H");
             //printf("\nFPS:%.1f\n", fps);
-            printf("Objects:\n\n");
+            
 
             ++frame_id;
             if (demo_json_port > 0) {
@@ -270,92 +270,102 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
             printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
 
-            if(!prefix){
-                if (!dont_show) {
-                    show_image_mat(show_img, "Demo");
-                    int c = wait_key_cv(1);
-                    if (c == 10) {
-                        if (frame_skip == 0) frame_skip = 60;
-                        else if (frame_skip == 4) frame_skip = 0;
-                        else if (frame_skip == 60) frame_skip = 4;
-                        else frame_skip = 0;
-                    }
-                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
-                    {
-                        flag_exit = 1;
-                    }
-                }
-            }else{
-
-
-				//original code//
-				/*
-                char buff[256];
-                sprintf(buff, "%s_%08d.jpg", prefix, count);
-                if(show_img) save_cv_jpg(show_img, buff);
-				*/
-
-				should_save_detection = 1;
-
-				memset(labelstr, 0, 4096);
-				memset(this_buff, 0, 100);
-									
-				if (local_nboxes > 0)
+            
+			if (!dont_show) {
+				show_image_mat(show_img, "Demo");
+				int c = wait_key_cv(1);
+				if (c == 10) {
+					if (frame_skip == 0) frame_skip = 60;
+					else if (frame_skip == 4) frame_skip = 0;
+					else if (frame_skip == 60) frame_skip = 4;
+					else frame_skip = 0;
+				}
+				else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
 				{
-					int i;
-					for (i = 0; i < local_nboxes; ++i) {
+					flag_exit = 1;
+				}
+                
+            }
+
+
+			//original code//
+			/*
+			char buff[256];
+			sprintf(buff, "%s_%08d.jpg", prefix, count);
+			if(show_img) save_cv_jpg(show_img, buff);
+			*/
+
+			should_save_detection = 1;
+
+			memset(labelstr, 0, 4096);
+			memset(this_buff, 0, 100);
+								
+			if (local_nboxes > 0)
+			{			
+				int i;
+				for (i = 0; i < local_nboxes; ++i) {
+					
+					for (k = 0; k < demo_classes; ++k) {
+
+						//printf("%f \n", local_dets[i].prob[k]);
 						
-						for (k = 0; k < demo_classes; ++k) {
+						if (local_dets[i].prob[k] > demo_thresh) {
 
-							//printf("%f \n", local_dets[i].prob[k]);
-							
-							if (local_dets[i].prob[k] > demo_thresh) {
-
-								should_save_detection++;			
-								strcat(labelstr, demo_names[k]);															
-								sprintf(this_buff, " %2.0f%%", local_dets[i].prob[k] * 100);
-								strcat(labelstr, this_buff);
-								strcat(labelstr, ", ");	
-							}							
-						}
-						//strcat(labelstr, "\n ");
+							should_save_detection++;			
+							strcat(labelstr, demo_names[k]);															
+							sprintf(this_buff, " %2.0f%%", local_dets[i].prob[k] * 100);
+							strcat(labelstr, this_buff);
+							strcat(labelstr, ", ");	
+						}							
 					}
+					//strcat(labelstr, "\n ");
+				}
 
 
 
-					if (should_save_detection > 0 )
+				if (should_save_detection > 0 )
+				{
+					printf("***detected: ");
+					labelstr[strlen(labelstr) - 2] = '\0';
+					labelstr[strlen(labelstr) - 1] = '\0';
+					printf("%s \n", labelstr);
+
+					if (skip_saving_frames <= 0)
 					{
-						printf("***detected: ");
-						labelstr[strlen(labelstr) - 2] = '\0';
-						labelstr[strlen(labelstr) - 1] = '\0';
-						printf("%s \n", labelstr);
+						//add delay for saving
+						//delay should be around 10s, so for frames to delay
+						skip_saving_frames = floor(10*fps); 
+						printf("Will skip next %d frames \n", skip_saving_frames);
 
-						if (skip_saving_frames <= 0)
-						{
-							//add delay for saving
-							//delay should be around 10s, so for frames to delay
-							skip_saving_frames = floor(10*fps); 
-							printf("Will skip next %d frames \n", skip_saving_frames);
+						//char buff[256];
 
-							//char buff[256];
+						if(prefix){
 							sprintf(buff, "%s_%010d.jpg", prefix, count);
+
 							if(show_img) save_cv_jpg(show_img, buff); //save image files
 
 							printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
 						}else
 						{
-							//Detected no saving for every 3s
-							printf("Skipped saving \n");
+							printf("JETSON_NANO_DETECTION:%s \n", labelstr);
 						}
 
+
+						
+					}else
+					{
+						//Detected no saving for every 3s
+						printf("Skipped saving \n");
 					}
-					skip_saving_frames--;
-				
 
-					//free(should_save_detection);
 				}
+				skip_saving_frames--;
+			
 
-            }
+				//free(should_save_detection);
+			}
+
+            
 			//samson, moved down
 			free_detections(local_dets, local_nboxes);
 
