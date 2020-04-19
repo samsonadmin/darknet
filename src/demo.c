@@ -179,7 +179,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     int count = 0;
     if(!prefix && !dont_show){
         int full_screen = 0;
-        create_window_cv("Demo", full_screen, 1352, 1013);
+        create_window_cv("Demo", full_screen, 640, 360);
     }
 
 
@@ -295,7 +295,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 			if(show_img) save_cv_jpg(show_img, buff);
 			*/
 
-			should_save_detection = 1;
+			should_save_detection = 0;
 
 			memset(labelstr, 0, 4096);
 			memset(this_buff, 0, 100);
@@ -321,49 +321,47 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 					//strcat(labelstr, "\n ");
 				}
 
+            }
 
+            if (should_save_detection > 0 )
+            {
+                printf("***detected: ");
+                labelstr[strlen(labelstr) - 2] = '\0';
+                labelstr[strlen(labelstr) - 1] = '\0';
+                printf("%s \n", labelstr);
 
-				if (should_save_detection > 0 )
-				{
-					printf("***detected: ");
-					labelstr[strlen(labelstr) - 2] = '\0';
-					labelstr[strlen(labelstr) - 1] = '\0';
-					printf("%s \n", labelstr);
+                if (skip_saving_frames <= 0)
+                {
+                    //add delay for saving
+                    //delay should be around 10s, so for frames to delay
+                    skip_saving_frames = floor(10*fps); 
+                    printf("Will skip next %d frames \n", skip_saving_frames);
 
-					if (skip_saving_frames <= 0)
-					{
-						//add delay for saving
-						//delay should be around 10s, so for frames to delay
-						skip_saving_frames = floor(10*fps); 
-						printf("Will skip next %d frames \n", skip_saving_frames);
+                    //char buff[256];
 
-						//char buff[256];
+                    if(prefix){
+                        sprintf(buff, "%s_%010d.jpg", prefix, count);
 
-						if(prefix){
-							sprintf(buff, "%s_%010d.jpg", prefix, count);
+                        if(show_img) save_cv_jpg(show_img, buff); //save image files
 
-							if(show_img) save_cv_jpg(show_img, buff); //save image files
+                        printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
+                    }else
+                    {
+                        printf("JETSON_NANO_DETECTION:%s \n", labelstr);
+                    }
+                    
+                }else
+                {
+                    //Detected no saving for every 3s
+                    printf("Skipped saving \n");
+                }
 
-							printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
-						}else
-						{
-							printf("JETSON_NANO_DETECTION:%s \n", labelstr);
-						}
+            }
+            skip_saving_frames--;
+        
 
-
-						
-					}else
-					{
-						//Detected no saving for every 3s
-						printf("Skipped saving \n");
-					}
-
-				}
-				skip_saving_frames--;
+            //free(should_save_detection);
 			
-
-				//free(should_save_detection);
-			}
 
             
 			//samson, moved down
