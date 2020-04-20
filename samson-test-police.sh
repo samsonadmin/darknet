@@ -24,12 +24,14 @@
 
 ###Works with X11 Server and low memory usage without -dont_show
 ###Example that changes framerate and rotate 
-#./darknet detector demo ~/trained-weight/police2020/samson-obj.data ~/trained-weight/police2020/samson-yolov3-tiny.cfg ~/trained-weight/police2020/samson-yolov3-tiny_final.weights "v4l2src io-mode=2 device=/dev/video0 ! video/x-raw, framerate=30/1, width=1920, height=1080 ! videoflip method=rotate-180 ! videoconvert ! video/x-raw,format=(string)BGR ! videorate ! video/x-raw,framerate=3/1 ! appsink sync=false async=false" -thresh 0.2 -mjpeg_port 8090 -json_port 8070 
+./darknet detector demo ~/trained-weight/police2020/samson-obj.data ~/trained-weight/police2020/samson-yolov3-tiny.cfg ~/trained-weight/police2020/samson-yolov3-tiny_final.weights "v4l2src  device=/dev/video0 ! video/x-raw, framerate=60/1, width=1920, height=1080 ! videoflip method=rotate-180 ! videoconvert ! appsink" -thresh 0.2 -mjpeg_port 8090 -json_port 8070 
 
-
+###v4l2src io-mode=2 device=/dev/video0 ! video/x-raw, framerate=60/1, width=1920, height=1080 ! videoflip method=rotate-180 ! videoconvert ! video/x-raw,format=(string)BGR ! videorate ! video/x-raw,framerate=3/1 ! appsink sync=false async=false" -thresh 0.2 -mjpeg_port 8090 -json_port 8070 
 
 
 ###Works with X11 Server and low memory usage without -dont_show
-#./darknet detector demo ~/trained-weight/police2020/samson-obj.data ~/trained-weight/police2020/samson-yolov3-tiny.cfg ~/trained-weight/police2020/samson-yolov3-tiny_final.weights "v4l2src io-mode=2 device=/dev/video0 ! video/x-raw, framerate=30/1, width=1920, height=1080 ! videoflip method=rotate-180 ! videoconvert ! video/x-raw,format=(string)BGR ! videorate ! video/x-raw,framerate=3/1 ! appsink sync=false async=false" -thresh 0.2 -mjpeg_port 8090 -json_port 8070 
+#./darknet detector demo ~/trained-weight/police2020/samson-obj.data ~/trained-weight/police2020/samson-yolov3-tiny.cfg ~/trained-weight/police2020/samson-yolov3-tiny_final.weights "v4l2src io-mode=2 device=/dev/video0 ! video/x-raw, framerate=30/1, width=1920, height=1080 ! videoflip method=rotate-180 ! videoconvert ! video/x-raw,format=I420 ! appsink sync=false async=false" -thresh 0.2 -mjpeg_port 8090 -json_port 8070 
 
 
+
+#./darknet detector demo ~/trained-weight/police2020/samson-obj.data ~/trained-weight/police2020/samson-yolov3-tiny.cfg ~/trained-weight/police2020/samson-yolov3-tiny_final.weights  "v4l2src io-mode=2 device=/dev/video0 do-timestamp=true ! video/x-raw, format=YUY2, width=1920, height=1080, framerate=60/1 ! videoconvert ! video/x-raw, format=BGR !  appsink sync=false async=false " -thresh 0.02 -prefix ~/images/d20200328-133048 -mjpeg_port 8090 -json_port 8070
