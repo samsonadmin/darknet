@@ -245,8 +245,8 @@ void backward_network_gpu(network net, network_state state)
     }
     if (net.adversarial) {
         int x_size = get_network_input_size(net)*net.batch;
-        printf(" x_size = %d, original_delta = %p, original_input = %p, net.learning_rate = %d \n",
-            x_size, original_delta, original_input, x_size, net.learning_rate);
+        printf(" x_size = %d, original_delta = %p, original_input = %p, net.learning_rate = %f \n",
+            x_size, original_delta, original_input, net.learning_rate);
         axpy_ongpu(x_size, net.learning_rate, original_delta, 1, original_input, 1);
         constrain_min_max_ongpu(x_size, 0, 1, original_input, 1);
     }
@@ -352,7 +352,8 @@ float train_network_datum_gpu(network net, float *x, float *y)
     if (net.adversarial_lr && rand_int(0, 1) == 1 && get_current_iteration(net) > net.burn_in) {
         net.adversarial = 1;
         float lr_old = net.learning_rate;
-        net.learning_rate = net.adversarial_lr;
+        float scale = 1.0 - (get_current_iteration(net) / ((float)net.max_batches));
+        net.learning_rate = net.adversarial_lr * scale;
         layer l = net.layers[net.n - 1];
         int y_size = get_network_output_size(net)*net.batch;
         if (net.layers[net.n - 1].truths) y_size = net.layers[net.n - 1].truths*net.batch;
