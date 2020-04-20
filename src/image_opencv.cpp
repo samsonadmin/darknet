@@ -471,7 +471,7 @@ extern "C" void show_image_mat(mat_cv *mat_ptr, const char *name)
         cv::namedWindow(name, cv::WINDOW_NORMAL);
         //samson, explictly set the fullscreen and the resizewindow becase when screen is smaller than 1080
 		cv::setWindowProperty(name, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
-        cv::resizeWindow(name, 640, 360);
+        cv::resizeWindow(name, 640, 360); //hack to enable for smaller screen
         cv::imshow(name, mat);
     }
     catch (...) {
