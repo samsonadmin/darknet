@@ -1,10 +1,6 @@
 GPU=1
 CUDNN=1
-<<<<<<< HEAD
-CUDNN_HALF=1
-=======
 CUDNN_HALF=0
->>>>>>> 1a3ca7d8a29c71f15487246ebb214ab33d20deab
 OPENCV=1
 AVX=0
 OPENMP=1
