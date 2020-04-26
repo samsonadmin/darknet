@@ -1,4 +1,3 @@
-#include "network.h"
 #include "detection_layer.h"
 #include "region_layer.h"
 #include "cost_layer.h"
@@ -214,7 +213,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     int count = 0;
     if(!prefix && !dont_show){
         int full_screen = 0;
-        create_window_cv("Demo", full_screen, 1352, 1013);
+        create_window_cv("Demo", full_screen, 640, 360);
     }
 
 
@@ -271,7 +270,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             //printf("\033[2J");
             //printf("\033[1;1H");
             //printf("\nFPS:%.1f\n", fps);
-            printf("Objects:\n\n");
+            
 
             ++frame_id;
             if (demo_json_port > 0) {
@@ -291,10 +290,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             }
 
             if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
-            free_detections(local_dets, local_nboxes);
-
-            printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
-
 
 			//samson, moved down
 			//free_detections(local_dets, local_nboxes);			
@@ -326,7 +321,15 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 
             }
 
-		should_save_detection = 0;
+
+			//original code//
+			/*
+			char buff[256];
+			sprintf(buff, "%s_%08d.jpg", prefix, count);
+			if(show_img) save_cv_jpg(show_img, buff);
+			*/
+
+			should_save_detection = 0;
 
 			memset(labelstr, 0, 4096);
 			memset(this_buff, 0, 100);
@@ -398,12 +401,11 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 			//samson, moved down
 			free_detections(local_dets, local_nboxes);
 
-
             // if you run it with param -mjpeg_port 8090  then open URL in your web-browser: http://localhost:8090
             if (mjpeg_port > 0 && show_img) {
                 int port = mjpeg_port;
                 int timeout = 400000;
-                int jpeg_quality = 40;    // 1 - 100
+                int jpeg_quality = 50;    // 1 - 100
                 send_mjpeg(show_img, port, timeout, jpeg_quality);
             }
 
@@ -487,7 +489,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
 	//samson
     //int i;
-
     const int nsize = 8;
     for (j = 0; j < nsize; ++j) {
         for (i = 32; i < 127; ++i) {
