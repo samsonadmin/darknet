@@ -69,7 +69,8 @@ void *fetch_in_thread(void *ptr)
             in_s = get_image_from_stream_resize(cap, net.w, net.h, net.c, &in_img, dont_close_stream);
         if (!in_s.data) {
             printf("Stream closed.\n");
-            flag_exit = 1;
+            custom_atomic_store_int(&flag_exit, 1);
+            custom_atomic_store_int(&run_fetch_in_thread, 0);
             //exit(EXIT_FAILURE);
             return 0;
         }
@@ -417,12 +418,12 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             }
 
             while (custom_atomic_load_int(&run_detect_in_thread)) {
-                if(avg_fps > 200) this_thread_yield();
+                if(avg_fps > 180) this_thread_yield();
                 else this_thread_sleep_for(thread_wait_ms);   // custom_join(detect_thread, 0);
             }
             if (!benchmark) {
                 while (custom_atomic_load_int(&run_fetch_in_thread)) {
-                    if (avg_fps > 200) this_thread_yield();
+                    if (avg_fps > 180) this_thread_yield();
                     else this_thread_sleep_for(thread_wait_ms);   // custom_join(fetch_thread, 0);
                 }
                 free_image(det_s);
