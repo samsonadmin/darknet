@@ -42,9 +42,9 @@ altNames = None
 def YOLO():
 
     global metaMain, netMain, altNames
-    configPath = "./cfg/yolov3.cfg"
-    weightPath = "./yolov3.weights"
-    metaPath = "./cfg/coco.data"
+    configPath = "../trained-weights/reference/yolov3-tiny-prn.cfg"
+    weightPath = "../trained-weights/reference/yolov3-tiny-prn.weights"
+    metaPath = "../trained-weights/reference/coco.data"
     if not os.path.exists(configPath):
         raise ValueError("Invalid config path `" +
                          os.path.abspath(configPath)+"`")
@@ -79,13 +79,13 @@ def YOLO():
                     pass
         except Exception:
             pass
-    #cap = cv2.VideoCapture(0)
-    cap = cv2.VideoCapture("test.mp4")
-    cap.set(3, 1280)
-    cap.set(4, 720)
-    out = cv2.VideoWriter(
-        "output.avi", cv2.VideoWriter_fourcc(*"MJPG"), 10.0,
-        (darknet.network_width(netMain), darknet.network_height(netMain)))
+    cap = cv2.VideoCapture(0)
+    #cap = cv2.VideoCapture("test.mp4")
+    cap.set(3, 1920)
+    cap.set(4, 1080)
+    #out = cv2.VideoWriter(
+    #    "output.avi", cv2.VideoWriter_fourcc(*"MJPG"), 10.0,
+    #    (darknet.network_width(netMain), darknet.network_height(netMain)))
     print("Starting the YOLO loop...")
 
     # Create an image we reuse for each detect
@@ -93,8 +93,8 @@ def YOLO():
                                     darknet.network_height(netMain),3)
     while True:
         prev_time = time.time()
-        ret, frame_read = cap.read()
-        frame_rgb = cv2.cvtColor(frame_read, cv2.COLOR_BGR2RGB)
+        ret, frame = cap.read()
+        frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         frame_resized = cv2.resize(frame_rgb,
                                    (darknet.network_width(netMain),
                                     darknet.network_height(netMain)),
@@ -109,7 +109,7 @@ def YOLO():
         cv2.imshow('Demo', image)
         cv2.waitKey(3)
     cap.release()
-    out.release()
+    #out.release()
 
 if __name__ == "__main__":
     YOLO()
