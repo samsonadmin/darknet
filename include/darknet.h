@@ -223,6 +223,7 @@ struct layer {
     int flipped;
     int inputs;
     int outputs;
+    float mean_alpha;
     int nweights;
     int nbiases;
     int extra;
@@ -263,12 +264,14 @@ struct layer {
     float smooth;
     float dot;
     int deform;
+    int grad_centr;
     int sway;
     int rotate;
     int stretch;
     int stretch_sway;
     float angle;
     float jitter;
+    float resize;
     float saturation;
     float exposure;
     float shift;
@@ -351,7 +354,7 @@ struct layer {
     float **layers_output;
     float **layers_delta;
     WEIGHTS_TYPE_T weights_type;
-    WEIGHTS_NORMALIZATION_T weights_normalizion;
+    WEIGHTS_NORMALIZATION_T weights_normalization;
     int   * map;
     int   * counts;
     float ** sums;
@@ -380,6 +383,7 @@ struct layer {
     float *weight_updates;
 
     float scale_x_y;
+    int objectness_smooth;
     float max_delta;
     float uc_normalizer;
     float iou_normalizer;
@@ -594,6 +598,7 @@ struct layer {
 
     float * input_antialiasing_gpu;
     float * output_gpu;
+    float * output_avg_gpu;
     float * activation_input_gpu;
     float * loss_gpu;
     float * delta_gpu;
@@ -886,6 +891,7 @@ typedef struct load_args {
     int show_imgs;
     int dontuse_opencv;
     float jitter;
+    float resize;
     int flip;
     int gaussian_noise;
     int blur;

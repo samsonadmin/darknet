@@ -100,9 +100,11 @@ void *detect_in_thread(void *ptr)
         float *X = det_s.data;
         float *prediction = network_predict(net, X);
 
-        memcpy(predictions[demo_index], prediction, l.outputs * sizeof(float));
-        mean_arrays(predictions, NFRAMES, l.outputs, avg);
-        l.output = avg;
+        int i;
+        for (i = 0; i < net.n; ++i) {
+            layer l = net.layers[i];
+            if (l.type == YOLO) l.mean_alpha = 1.0 / NFRAMES;
+        }
 
         cv_images[demo_index] = det_img;
         det_img = cv_images[(demo_index + NFRAMES / 2 + 1) % NFRAMES];
@@ -136,7 +138,7 @@ double get_wall_time()
 }
 
 void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int cam_index, const char *filename, char **names, int classes,
-    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output, int letter_box_in, int time_limit_sec, char *http_post_host,
+    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int dontdraw_bbox, int json_port, int dont_show, int ext_output, int letter_box_in, int time_limit_sec, char *http_post_host,
     int benchmark, int benchmark_layers)
 {
     letter_box = letter_box_in;
@@ -250,6 +252,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     double start_time = get_time_point();
     float avg_fps = 0;
     int frame_counter = 0;
+    int global_frame_counter = 0;
 
     while(1){
         ++count;
@@ -290,6 +293,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 }
             }
 
+<<<<<<< HEAD
             if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
 
 			//samson, moved down
@@ -381,6 +385,25 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
                         printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
                     }else
+=======
+            if (!benchmark && !dontdraw_bbox) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
+            free_detections(local_dets, local_nboxes);
+
+            printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
+
+            if(!prefix){
+                if (!dont_show) {
+                    const int each_frame = max_val_cmp(1, avg_fps / 100);
+                    if(global_frame_counter % each_frame == 0) show_image_mat(show_img, "Demo");
+                    int c = wait_key_cv(1);
+                    if (c == 10) {
+                        if (frame_skip == 0) frame_skip = 60;
+                        else if (frame_skip == 4) frame_skip = 0;
+                        else if (frame_skip == 60) frame_skip = 4;
+                        else frame_skip = 0;
+                    }
+                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
+>>>>>>> 9cd44eea9513562c7247f4d5500d2471133f64b2
                     {
                         printf("JETSON_NANO_DETECTION:%s \n", labelstr);
                     }
@@ -455,6 +478,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
             float spent_time = (get_time_point() - start_time) / 1000000;
             frame_counter++;
+            global_frame_counter++;
             if (spent_time >= 3.0f) {
                 //printf(" spent_time = %f \n", spent_time);
                 avg_fps = frame_counter / spent_time;
@@ -503,7 +527,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 }
 #else
 void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int cam_index, const char *filename, char **names, int classes,
-    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int json_port, int dont_show, int ext_output, int letter_box_in, int time_limit_sec, char *http_post_host,
+    int frame_skip, char *prefix, char *out_filename, int mjpeg_port, int dontdraw_bbox, int json_port, int dont_show, int ext_output, int letter_box_in, int time_limit_sec, char *http_post_host,
     int benchmark, int benchmark_layers)
 {
     fprintf(stderr, "Demo needs OpenCV for webcam images.\n");
