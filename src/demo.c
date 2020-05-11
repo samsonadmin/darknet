@@ -293,8 +293,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 }
             }
 
-<<<<<<< HEAD
-            if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
+
+            if (!benchmark && !dontdraw_bbox) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
 
 			//samson, moved down
 			//free_detections(local_dets, local_nboxes);			
@@ -385,25 +385,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
                         printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
                     }else
-=======
-            if (!benchmark && !dontdraw_bbox) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
-            free_detections(local_dets, local_nboxes);
-
-            printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
-
-            if(!prefix){
-                if (!dont_show) {
-                    const int each_frame = max_val_cmp(1, avg_fps / 100);
-                    if(global_frame_counter % each_frame == 0) show_image_mat(show_img, "Demo");
-                    int c = wait_key_cv(1);
-                    if (c == 10) {
-                        if (frame_skip == 0) frame_skip = 60;
-                        else if (frame_skip == 4) frame_skip = 0;
-                        else if (frame_skip == 60) frame_skip = 4;
-                        else frame_skip = 0;
-                    }
-                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
->>>>>>> 9cd44eea9513562c7247f4d5500d2471133f64b2
                     {
                         printf("JETSON_NANO_DETECTION:%s \n", labelstr);
                     }
