@@ -156,6 +156,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     calculate_binary_weights(net);
     srand(2222222);
 
+    int i;
     for (i = 0; i < net.n; ++i) {
         layer l = net.layers[i];
         if (l.type == YOLO) l.mean_alpha = 1.0 / NFRAMES;
@@ -237,7 +238,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     }
 
 	//samson
-	int i, k, skip_saving_frames;
+	int k, skip_saving_frames;
 	skip_saving_frames = 0;
 	char labelstr[4096] = { 0 };
 	char this_buff[100];
