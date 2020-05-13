@@ -100,12 +100,6 @@ void *detect_in_thread(void *ptr)
         float *X = det_s.data;
         float *prediction = network_predict(net, X);
 
-        int i;
-        for (i = 0; i < net.n; ++i) {
-            layer l = net.layers[i];
-            if (l.type == YOLO) l.mean_alpha = 1.0 / NFRAMES;
-        }
-
         cv_images[demo_index] = det_img;
         det_img = cv_images[(demo_index + NFRAMES / 2 + 1) % NFRAMES];
         demo_index = (demo_index + 1) % NFRAMES;
@@ -161,6 +155,12 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     fuse_conv_batchnorm(net);
     calculate_binary_weights(net);
     srand(2222222);
+
+    int i;
+    for (i = 0; i < net.n; ++i) {
+        layer l = net.layers[i];
+        if (l.type == YOLO) l.mean_alpha = 1.0 / NFRAMES;
+    }
 
     if(filename){
         printf("video file: %s\n", filename);
