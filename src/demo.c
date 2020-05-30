@@ -293,25 +293,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 }
             }
 
-<<<<<<< HEAD
-            if (!benchmark && !dontdraw_bbox) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
-            free_detections(local_dets, local_nboxes);
-
-            printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
-
-            if(!prefix){
-                if (!dont_show) {
-                    const int each_frame = max_val_cmp(1, avg_fps / 60);
-                    if(global_frame_counter % each_frame == 0) show_image_mat(show_img, "Demo");
-                    int c = wait_key_cv(1);
-                    if (c == 10) {
-                        if (frame_skip == 0) frame_skip = 60;
-                        else if (frame_skip == 4) frame_skip = 0;
-                        else if (frame_skip == 60) frame_skip = 4;
-                        else frame_skip = 0;
-                    }
-                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
-=======
             if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
 
 			//samson, moved down
@@ -329,6 +310,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
             
 			if (!dont_show) {
+                const int each_frame = max_val_cmp(1, avg_fps / 60);
+                if(global_frame_counter % each_frame == 0) show_image_mat(show_img, "Demo");                
 				show_image_mat(show_img, "Demo");
 				int c = wait_key_cv(1);
 				if (c == 10) {
@@ -403,7 +386,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
                         printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
                     }else
->>>>>>> 2c2b8b4af4fb7ea0d461b61f8d02f7419c4eec01
+
                     {
                         printf("JETSON_NANO_DETECTION:%s \n", labelstr);
                     }
@@ -510,11 +493,9 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
     free_ptrs((void **)names, net.layers[net.n - 1].classes);
 
-<<<<<<< HEAD
-=======
 	//samson
     //int i;
->>>>>>> 2c2b8b4af4fb7ea0d461b61f8d02f7419c4eec01
+
     const int nsize = 8;
     for (j = 0; j < nsize; ++j) {
         for (i = 32; i < 127; ++i) {
