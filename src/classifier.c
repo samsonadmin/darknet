@@ -116,11 +116,11 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
 #ifdef OPENCV
     //args.threads = 3;
     mat_cv* img = NULL;
-    float max_img_loss = 10;
+    float max_img_loss = net.max_chart_loss;
     int number_of_lines = 100;
     int img_size = 1000;
     char windows_name[100];
-    sprintf(windows_name, "average loss (id:%d)", random_gen());
+    sprintf(windows_name, "chart_%s.png", base);
     if (!dontuse_opencv) img = draw_train_chart(windows_name, max_img_loss, net.max_batches, number_of_lines, img_size, dont_show, chart_path);
 #endif  //OPENCV
 
@@ -187,7 +187,7 @@ void train_classifier(char *datacfg, char *cfgfile, char *weightfile, int *gpus,
             draw_precision = 1;
         }
 
-        time_remaining = (net.max_batches - i)*(what_time_is_it_now() - start) / 60 / 60;
+        time_remaining = ((net.max_batches - i) / ngpus) * (what_time_is_it_now() - start) / 60 / 60;
         // set initial value, even if resume training from 10000 iteration
         if (avg_time < 0) avg_time = time_remaining;
         else avg_time = alpha_time * time_remaining + (1 -  alpha_time) * avg_time;

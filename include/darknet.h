@@ -104,7 +104,7 @@ typedef struct tree {
 
 // activations.h
 typedef enum {
-    LOGISTIC, RELU, RELU6, RELIE, LINEAR, RAMP, TANH, PLSE, LEAKY, ELU, LOGGY, STAIR, HARDTAN, LHTAN, SELU, SWISH, MISH, NORM_CHAN, NORM_CHAN_SOFTMAX, NORM_CHAN_SOFTMAX_MAXVAL
+    LOGISTIC, RELU, RELU6, RELIE, LINEAR, RAMP, TANH, PLSE, LEAKY, ELU, LOGGY, STAIR, HARDTAN, LHTAN, SELU, GELU, SWISH, MISH, NORM_CHAN, NORM_CHAN_SOFTMAX, NORM_CHAN_SOFTMAX_MAXVAL
 }ACTIVATION;
 
 // parser.h
@@ -223,6 +223,7 @@ struct layer {
     int flipped;
     int inputs;
     int outputs;
+    float mean_alpha;
     int nweights;
     int nbiases;
     int extra;
@@ -263,12 +264,14 @@ struct layer {
     float smooth;
     float dot;
     int deform;
+    int grad_centr;
     int sway;
     int rotate;
     int stretch;
     int stretch_sway;
     float angle;
     float jitter;
+    float resize;
     float saturation;
     float exposure;
     float shift;
@@ -351,7 +354,7 @@ struct layer {
     float **layers_output;
     float **layers_delta;
     WEIGHTS_TYPE_T weights_type;
-    WEIGHTS_NORMALIZATION_T weights_normalizion;
+    WEIGHTS_NORMALIZATION_T weights_normalization;
     int   * map;
     int   * counts;
     float ** sums;
@@ -380,6 +383,7 @@ struct layer {
     float *weight_updates;
 
     float scale_x_y;
+    int objectness_smooth;
     float max_delta;
     float uc_normalizer;
     float iou_normalizer;
@@ -594,6 +598,7 @@ struct layer {
 
     float * input_antialiasing_gpu;
     float * output_gpu;
+    float * output_avg_gpu;
     float * activation_input_gpu;
     float * loss_gpu;
     float * delta_gpu;
@@ -706,6 +711,7 @@ typedef struct network {
     int attention;
     int adversarial;    
     float adversarial_lr;
+    float max_chart_loss;
     int letter_box;
     float angle;
     float aspect;
@@ -830,6 +836,12 @@ typedef struct detection{
     int points; // bit-0 - center, bit-1 - top-left-corner, bit-2 - bottom-right-corner
 } detection;
 
+// network.c -batch inference
+typedef struct det_num_pair {
+    int num;
+    detection *dets;
+} det_num_pair, *pdet_num_pair;
+
 // matrix.h
 typedef struct matrix {
     int rows, cols;
@@ -880,6 +892,7 @@ typedef struct load_args {
     int show_imgs;
     int dontuse_opencv;
     float jitter;
+    float resize;
     int flip;
     int gaussian_noise;
     int blur;
@@ -939,7 +952,9 @@ LIB_API void diounms_sort(detection *dets, int total, int classes, float thresh,
 LIB_API float *network_predict(network net, float *input);
 LIB_API float *network_predict_ptr(network *net, float *input);
 LIB_API detection *get_network_boxes(network *net, int w, int h, float thresh, float hier, int *map, int relative, int *num, int letter);
+LIB_API det_num_pair* network_predict_batch(network *net, image im, int batch_size, int w, int h, float thresh, float hier, int *map, int relative, int letter);
 LIB_API void free_detections(detection *dets, int n);
+LIB_API void free_batch_detections(det_num_pair *det_num_pairs, int n);
 LIB_API void fuse_conv_batchnorm(network net);
 LIB_API void calculate_binary_weights(network net);
 LIB_API char *detection_to_json(detection *dets, int nboxes, int classes, char **names, long long int frame_id, char *filename);
