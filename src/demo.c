@@ -238,7 +238,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
 
 	//samson
-	int i, k, skip_saving_frames;
+	int k, skip_saving_frames;
 	skip_saving_frames = 0;
 	char labelstr[4096] = { 0 };
 	char this_buff[100];
