@@ -239,7 +239,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
         //'W', 'M', 'V', '2'
     }
 
-
 	//samson
 	int k, skip_saving_frames;
 	skip_saving_frames = 0;
@@ -298,7 +297,8 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 }
             }
 
-            if (!benchmark) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
+
+            if (!benchmark && !dontdraw_bbox) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
 
 			//samson, moved down
 			//free_detections(local_dets, local_nboxes);			
@@ -312,7 +312,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 		
 
             printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
-
             
 			if (!dont_show) {
                 const int each_frame = max_val_cmp(1, avg_fps / 60);
@@ -391,7 +390,6 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
 
                         printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
                     }else
-
                     {
                         printf("JETSON_NANO_DETECTION:%s \n", labelstr);
                     }
@@ -496,11 +494,11 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     }
     free(cv_images);
 
+    
     free_ptrs((void **)names, net.layers[net.n - 1].classes);
 
 	//samson
     //int i;
-
     const int nsize = 8;
     for (j = 0; j < nsize; ++j) {
         for (i = 32; i < 127; ++i) {

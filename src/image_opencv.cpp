@@ -482,7 +482,7 @@ extern "C" void show_image_mat(mat_cv *mat_ptr, const char *name)
         cv::namedWindow(name, cv::WINDOW_NORMAL);
         //samson, explictly set the fullscreen and the resizewindow becase when screen is smaller than 1080
 		cv::setWindowProperty(name, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
-        cv::resizeWindow(name, 640, 360); //hack to enable for smaller screen
+        cv::resizeWindow(name, 640, 360); //hack to enable for smaller screen        
         cv::imshow(name, mat);
     }
     catch (...) {
@@ -605,7 +605,6 @@ extern "C" cap_cv* get_capture_webcam(int index)
 		cap->set(cv::CAP_PROP_FRAME_HEIGHT, 1080); //samson 	
 		//cap->set(CV_CAP_PROP_FPS, 5); //samson 
 		cap->set(cv::CAP_PROP_FPS, 30); //samson 
-
     }
     catch (...) {
         cerr << " OpenCV exception: Web-camera " << index << " can't be opened! \n";
@@ -928,7 +927,7 @@ extern "C" void draw_detections_cv_v3(mat_cv* mat, detection *dets, int num, flo
                 //alphabet = 0;
                 //}
 
-                //printf("%d %s: %.0f%%\n", i, names[class_id], prob*100);
+                //printf("%d %s: %.0fcreate_window_cv("Demo", full_screen, 640, 360);show_%%\n", i, names[class_id], prob*100);
                 int offset = class_id * 123457 % classes;
                 float red = get_color(2, offset, classes);
                 float green = get_color(1, offset, classes);
