@@ -480,6 +480,9 @@ extern "C" void show_image_mat(mat_cv *mat_ptr, const char *name)
         if (mat_ptr == NULL) return;
         cv::Mat &mat = *(cv::Mat *)mat_ptr;
         cv::namedWindow(name, cv::WINDOW_NORMAL);
+        //samson, explictly set the fullscreen and the resizewindow becase when screen is smaller than 1080
+		cv::setWindowProperty(name, cv::WND_PROP_FULLSCREEN, cv::WINDOW_FULLSCREEN);
+        cv::resizeWindow(name, 640, 360); //hack to enable for smaller screen
         cv::imshow(name, mat);
     }
     catch (...) {
@@ -596,6 +599,13 @@ extern "C" cap_cv* get_capture_webcam(int index)
         cap = new cv::VideoCapture(index);
         //cap->set(CV_CAP_PROP_FRAME_WIDTH, 1280);
         //cap->set(CV_CAP_PROP_FRAME_HEIGHT, 960);
+		//cap->set(cv::CAP_PROP_FOURCC, cv::FOURCC('M', 'J', 'P', 'G') ); //samson 
+		//cap->set(CV_CAP_PROP_FOURCC, CV_FOURCC('I', '4', '2', '0') ); //samson 
+		cap->set(cv::CAP_PROP_FRAME_WIDTH, 1920); //samson
+		cap->set(cv::CAP_PROP_FRAME_HEIGHT, 1080); //samson 	
+		//cap->set(CV_CAP_PROP_FPS, 5); //samson 
+		cap->set(cv::CAP_PROP_FPS, 30); //samson 
+
     }
     catch (...) {
         cerr << " OpenCV exception: Web-camera " << index << " can't be opened! \n";
