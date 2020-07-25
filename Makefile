@@ -1,12 +1,12 @@
-GPU=0
-CUDNN=0
+GPU=1
+CUDNN=1
 CUDNN_HALF=0
-OPENCV=0
+OPENCV=1
 AVX=0
-OPENMP=0
-LIBSO=0
-ZED_CAMERA=0
-ZED_CAMERA_v2_8=0
+OPENMP=1
+LIBSO=1
+ZED_CAMERA=0 # ZED SDK 3.0 and above
+ZED_CAMERA_v2_8=0 # ZED SDK 2.X
 
 # set GPU=1 and CUDNN=1 to speedup on GPU
 # set CUDNN_HALF=1 to further speedup 3 x times (Mixed-precision on Tensor Cores) GPU: Volta, Xavier, Turing and higher
@@ -41,7 +41,7 @@ OS := $(shell uname)
 # ARCH= -gencode arch=compute_60,code=sm_60
 
 # For Jetson TX1, Tegra X1, DRIVE CX, DRIVE PX - uncomment:
-# ARCH= -gencode arch=compute_53,code=[sm_53,compute_53]
+ARCH= -gencode arch=compute_53,code=[sm_53,compute_53]
 
 # For Jetson Tx2 or Drive-PX2 uncomment:
 # ARCH= -gencode arch=compute_62,code=[sm_62,compute_62]

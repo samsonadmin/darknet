@@ -23,7 +23,7 @@
 extern int check_mistakes;
 //int windows = 0;
 
-float colors[6][3] = { {1,0,1}, {0,0,1},{0,1,1},{0,1,0},{1,1,0},{1,0,0} };
+float colors[6][3] = { {0,1,1}, {0,0,1}, {0,1,0}, {1,0,0}, {1,0,1}, {1,1,0} };
 
 float get_color(int c, int x, int max)
 {

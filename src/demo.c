@@ -1,4 +1,3 @@
-#include "network.h"
 #include "detection_layer.h"
 #include "region_layer.h"
 #include "cost_layer.h"
@@ -219,7 +218,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     int count = 0;
     if(!prefix && !dont_show){
         int full_screen = 0;
-        create_window_cv("Demo", full_screen, 1352, 1013);
+        create_window_cv("Demo", full_screen, 640, 360);
     }
 
 
@@ -239,6 +238,15 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
         //'X', 'V', 'I', 'D'
         //'W', 'M', 'V', '2'
     }
+
+	//samson
+	int k, skip_saving_frames;
+	skip_saving_frames = 0;
+	char labelstr[4096] = { 0 };
+	char this_buff[100];
+	char buff[256];
+	int should_save_detection = 1;
+
 
     int send_http_post_once = 0;
     const double start_time_lim = get_time_point();
@@ -270,7 +278,7 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
             //printf("\033[2J");
             //printf("\033[1;1H");
             //printf("\nFPS:%.1f\n", fps);
-            printf("Objects:\n\n");
+            
 
             ++frame_id;
             if (demo_json_port > 0) {
@@ -289,38 +297,125 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
                 }
             }
 
+
             if (!benchmark && !dontdraw_bbox) draw_detections_cv_v3(show_img, local_dets, local_nboxes, demo_thresh, demo_names, demo_alphabet, demo_classes, demo_ext_output);
-            free_detections(local_dets, local_nboxes);
 
-            printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
+			//samson, moved down
+			//free_detections(local_dets, local_nboxes);			
 
-            if(!prefix){
-                if (!dont_show) {
-                    const int each_frame = max_val_cmp(1, avg_fps / 60);
-                    if(global_frame_counter % each_frame == 0) show_image_mat(show_img, "Demo");
-                    int c = wait_key_cv(1);
-                    if (c == 10) {
-                        if (frame_skip == 0) frame_skip = 60;
-                        else if (frame_skip == 4) frame_skip = 0;
-                        else if (frame_skip == 60) frame_skip = 4;
-                        else frame_skip = 0;
-                    }
-                    else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
-                    {
-                        flag_exit = 1;
-                    }
-                }
-            }else{
+			//Samson, TBD: Send image to some program
+			/*
                 char buff[256];
                 sprintf(buff, "%s_%08d.jpg", prefix, count);
-                if(show_img) save_cv_jpg(show_img, buff);
+                if(show_img) save_cv_jpg(show_img, buff); //save image files
+				*/
+		
+
+            printf("\nFPS:%.1f \t AVG_FPS:%.1f\n", fps, avg_fps);
+            
+			if (!dont_show) {
+                const int each_frame = max_val_cmp(1, avg_fps / 60);
+                if(global_frame_counter % each_frame == 0) show_image_mat(show_img, "Demo");                
+				show_image_mat(show_img, "Demo");
+				int c = wait_key_cv(1);
+				if (c == 10) {
+					if (frame_skip == 0) frame_skip = 60;
+					else if (frame_skip == 4) frame_skip = 0;
+					else if (frame_skip == 60) frame_skip = 4;
+					else frame_skip = 0;
+				}
+				else if (c == 27 || c == 1048603) // ESC - exit (OpenCV 2.x / 3.x)
+				{
+					flag_exit = 1;
+				}
+                
             }
+
+
+			//original code//
+			/*
+			char buff[256];
+			sprintf(buff, "%s_%08d.jpg", prefix, count);
+			if(show_img) save_cv_jpg(show_img, buff);
+			*/
+
+			should_save_detection = 0;
+
+			memset(labelstr, 0, 4096);
+			memset(this_buff, 0, 100);
+								
+			if (local_nboxes > 0)
+			{			
+				int i;
+				for (i = 0; i < local_nboxes; ++i) {
+					
+					for (k = 0; k < demo_classes; ++k) {
+
+						//printf("%f \n", local_dets[i].prob[k]);
+						
+						if (local_dets[i].prob[k] > demo_thresh) {
+
+							should_save_detection++;			
+							strcat(labelstr, demo_names[k]);															
+							sprintf(this_buff, " %2.0f%%", local_dets[i].prob[k] * 100);
+							strcat(labelstr, this_buff);
+							strcat(labelstr, ", ");	
+						}							
+					}
+					//strcat(labelstr, "\n ");
+				}
+
+            }
+
+            if (should_save_detection > 0 )
+            {
+                printf("***detected: ");
+                labelstr[strlen(labelstr) - 2] = '\0';
+                labelstr[strlen(labelstr) - 1] = '\0';
+                printf("%s \n", labelstr);
+
+                if (skip_saving_frames <= 0)
+                {
+                    //add delay for saving
+                    //delay should be around 10s, so for frames to delay
+                    skip_saving_frames = floor(10*fps); 
+                    printf("Will skip next %d frames \n", skip_saving_frames);
+
+                    //char buff[256];
+
+                    if(prefix){
+                        sprintf(buff, "%s_%010d.jpg", prefix, count);
+
+                        if(show_img) save_cv_jpg(show_img, buff); //save image files
+
+                        printf("JETSON_NANO_DETECTION:%s:%s \n", labelstr, buff);
+                    }else
+                    {
+                        printf("JETSON_NANO_DETECTION:%s \n", labelstr);
+                    }
+                    
+                }else
+                {
+                    //Detected no saving for every 3s
+                    printf("Skipped saving \n");
+                }
+
+            }
+            skip_saving_frames--;
+        
+
+            //free(should_save_detection);
+			
+
+            
+			//samson, moved down
+			free_detections(local_dets, local_nboxes);
 
             // if you run it with param -mjpeg_port 8090  then open URL in your web-browser: http://localhost:8090
             if (mjpeg_port > 0 && show_img) {
                 int port = mjpeg_port;
                 int timeout = 400000;
-                int jpeg_quality = 40;    // 1 - 100
+                int jpeg_quality = 50;    // 1 - 100
                 send_mjpeg(show_img, port, timeout, jpeg_quality);
             }
 
@@ -399,8 +494,11 @@ void demo(char *cfgfile, char *weightfile, float thresh, float hier_thresh, int 
     }
     free(cv_images);
 
+    
     free_ptrs((void **)names, net.layers[net.n - 1].classes);
 
+	//samson
+    //int i;
     const int nsize = 8;
     for (j = 0; j < nsize; ++j) {
         for (i = 32; i < 127; ++i) {

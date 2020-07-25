@@ -1,4 +1,13 @@
+<<<<<<< HEAD
 # Yolo-v4 and Yolo-v3/v2 for Windows and Linux
+=======
+<<<<<<< HEAD
+# Yolo-v3 and Yolo-v2 for Windows and Linux for jetson nano
+# modification from https://github.com/AlexeyAB/darknet
+=======
+# Yolo-v4 and Yolo-v3/v2 for Windows and Linux
+>>>>>>> 08bc0c9373158da6c42f11b1359ca2c017cef1b5
+>>>>>>> 2c2b8b4af4fb7ea0d461b61f8d02f7419c4eec01
 ### (neural network for object detection) - Tensor Cores can be used on [Linux](https://github.com/AlexeyAB/darknet#how-to-compile-on-linux) and [Windows](https://github.com/AlexeyAB/darknet#how-to-compile-on-windows-using-cmake-gui)
 
 Paper Yolo v4: https://arxiv.org/abs/2004.10934
